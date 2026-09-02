@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Breakout</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <main class="pagina">
+      <header class="marca"><i></i> BREAK<span>OUT</span></header>
+      <section class="jogo" aria-label="Jogo Breakout">
+        <div class="placar">
+          <div>
+            <small>PONTUAÇÃO</small><strong id="pontuacao">000000</strong>
+          </div>
+          <p>QUEBRE TODOS OS BLOCOS</p>
+          <div class="vidas">
+            <small>VIDAS</small><strong id="vidas">● ● ●</strong>
+          </div>
+        </div>
+        <div class="palco" id="palco">
+          <canvas id="canvas" width="900" height="560"></canvas>
+          <div class="sobreposicao" id="sobreposicao">
+            <section class="painel" id="menu">
+              <p class="rotulo">ARCADE CLÁSSICO</p>
+              <h1>BREAK<span>OUT</span></h1>
+              <p class="descricao">
+                Escolha como deseja controlar a plataforma.
+              </p>
+              <div
+                class="opcoes-controle"
+                role="group"
+                aria-label="Escolha o controle"
+              >
+                <button class="controle selecionado" data-controle="teclado">
+                  ⌨<b>TECLADO</b><small>Setas ou A / D</small>
+                </button>
+                <button class="controle" data-controle="mouse">
+                  ◉<b>MOUSE</b><small>Mova o cursor</small>
+                </button>
+              </div>
+              <button class="primario" id="iniciar">
+                ▶ &nbsp; INICIAR JOGO
+              </button>
+            </section>
+            <section class="painel escondido" id="pausa">
+              <p class="rotulo">JOGO PAUSADO</p>
+              <h2>Continue quando quiser.</h2>
+              <button class="primario" id="continuar">
+                ▶ &nbsp; CONTINUAR
+              </button>
+              <button class="secundario sair-menu">SAIR PARA O MENU</button>
+            </section>
+            <section class="painel escondido" id="resultado">
+              <p class="rotulo" id="tituloResultado">FIM DE JOGO</p>
+              <h2 id="mensagemResultado"></h2>
+              <p class="resultado-pontos">
+                PONTUAÇÃO FINAL <strong id="pontuacaoFinal">0</strong>
+              </p>
+              <button class="primario" id="jogarNovamente">
+                ↻ &nbsp; JOGAR NOVAMENTE
+              </button>
+              <button class="secundario sair-menu">VOLTAR AO MENU</button>
+            </section>
+          </div>
+        </div>
+        <div class="barra">
+          <span id="controleAtual">CONTROLE: TECLADO</span
+          ><button id="som">♪ SOM ATIVO</button
+          ><button id="pausar">Ⅱ PAUSAR</button>
+        </div>
+      </section>
+      <footer>PROJETO ACADÊMICO • HTML • CSS • JAVASCRIPT</footer>
+    </main>
+    <script src="js/game.js"></script>
+  </body>
+</html>
