@@ -4,7 +4,7 @@ const canvas = document.querySelector("#canvas");
 const ctx = canvas.getContext("2d");
 const W = canvas.width,
   H = canvas.height;
-const LARGURA_PLATAFORMA = 130,
+const LARGURA_PLATAFORMA = 100,
   ALTURA_PLATAFORMA = 14,
   RAIO_BOLA = 8;
 const cores = [
@@ -22,18 +22,21 @@ const elementos = {
   pausa: document.querySelector("#pausa"),
   resultado: document.querySelector("#resultado"),
   pontuacao: document.querySelector("#pontuacao"),
+  nivel: document.querySelector("#nivel"),
   vidas: document.querySelector("#vidas"),
   pontuacaoFinal: document.querySelector("#pontuacaoFinal"),
   tituloResultado: document.querySelector("#tituloResultado"),
   mensagemResultado: document.querySelector("#mensagemResultado"),
   controleAtual: document.querySelector("#controleAtual"),
   som: document.querySelector("#som"),
+  telaCheia: document.querySelector("#telaCheia"),
   pausar: document.querySelector("#pausar"),
 };
 
 let estado = "menu";
 let tipoControle = "teclado";
 let somAtivo = true;
+let acaoResultado = "reiniciar";
 const teclas = { esquerda: false, direita: false };
 let mouseX = W / 2;
 const jogo = {
@@ -44,8 +47,38 @@ const jogo = {
   vy: -5.2,
   vidas: 3,
   pontos: 0,
+  nivel: 1,
+  totalNiveis: 5,
   blocos: [],
 };
+
+const configuracoesNiveis = [
+  { linhas: 6, colunas: 10, formato: () => true },
+  {
+    linhas: 7,
+    colunas: 10,
+    formato: (linha, coluna) =>
+      !(linha % 2 === 1 && (coluna === 0 || coluna === 9)),
+  },
+  {
+    linhas: 8,
+    colunas: 11,
+    formato: (linha, coluna) =>
+      Math.abs(coluna - 5) + Math.abs(linha - 3.5) <= 7,
+  },
+  {
+    linhas: 9,
+    colunas: 12,
+    formato: (linha, coluna) =>
+      (linha + coluna) % 2 === 0 || linha === 0 || linha === 8,
+  },
+  {
+    linhas: 9,
+    colunas: 12,
+    formato: (linha, coluna) =>
+      !((linha === 3 || linha === 4) && coluna >= 4 && coluna <= 7),
+  },
+];
 
 function mostrarTela(nome) {
   estado = nome;
@@ -54,7 +87,7 @@ function mostrarTela(nome) {
   elementos.pausa.classList.toggle("escondido", nome !== "pausado");
   elementos.resultado.classList.toggle(
     "escondido",
-    !["vitoria", "derrota"].includes(nome),
+    !["nivelConcluido", "vitoria", "derrota"].includes(nome),
   );
   elementos.pausar.textContent =
     nome === "pausado" ? "▶ CONTINUAR" : "Ⅱ PAUSAR";
@@ -62,35 +95,42 @@ function mostrarTela(nome) {
 
 function criarBlocos() {
   jogo.blocos = [];
-  const colunas = 10,
-    linhas = 6,
+  const configuracao = configuracoesNiveis[jogo.nivel - 1];
+  const colunas = configuracao.colunas,
+    linhas = configuracao.linhas,
     espaco = 8,
-    margem = 46;
+    margem = 38;
   const largura = (W - margem * 2 - espaco * (colunas - 1)) / colunas;
   for (let linha = 0; linha < linhas; linha++)
     for (let coluna = 0; coluna < colunas; coluna++)
-      jogo.blocos.push({
-        x: margem + coluna * (largura + espaco),
-        y: 78 + linha * 30,
-        w: largura,
-        h: 20,
-        cor: cores[linha],
-        ativo: true,
-      });
+      if (configuracao.formato(linha, coluna))
+        jogo.blocos.push({
+          x: margem + coluna * (largura + espaco),
+          y: 55 + linha * 28,
+          w: largura,
+          h: 20,
+          cor: cores[(linha + jogo.nivel - 1) % cores.length],
+          ativo: true,
+        });
 }
 
-function reposicionarBola() {
-  jogo.plataformaX = (W - LARGURA_PLATAFORMA) / 2;
-  jogo.bolaX = W / 2;
+function reposicionarBola(manterPlataforma = false) {
+  if (!manterPlataforma) {
+    jogo.plataformaX = (W - LARGURA_PLATAFORMA) / 2;
+  }
+  jogo.bolaX = jogo.plataformaX + LARGURA_PLATAFORMA / 2;
   jogo.bolaY = H - 64;
-  jogo.vx = (Math.random() > 0.5 ? 1 : -1) * 4.6;
-  jogo.vy = -5.2;
-  mouseX = W / 2;
+  const velocidade = 4.6 + (jogo.nivel - 1) * 0.65;
+  jogo.vx = (Math.random() > 0.5 ? 1 : -1) * velocidade;
+  jogo.vy = -(velocidade + 0.6);
+  // Mantém o alvo do mouse junto da plataforma após perder uma vida.
+  mouseX = jogo.plataformaX + LARGURA_PLATAFORMA / 2;
 }
 
 function iniciarJogo() {
   jogo.pontos = 0;
   jogo.vidas = 3;
+  jogo.nivel = 1;
   criarBlocos();
   reposicionarBola();
   atualizarPlacar();
@@ -99,6 +139,7 @@ function iniciarJogo() {
 
 function atualizarPlacar() {
   elementos.pontuacao.textContent = String(jogo.pontos).padStart(6, "0");
+  elementos.nivel.textContent = `${jogo.nivel} / ${jogo.totalNiveis}`;
   elementos.vidas.textContent =
     "● ".repeat(jogo.vidas) + "○ ".repeat(3 - jogo.vidas);
 }
@@ -154,7 +195,10 @@ function atualizar() {
     const impacto =
         (jogo.bolaX - (jogo.plataformaX + LARGURA_PLATAFORMA / 2)) /
         (LARGURA_PLATAFORMA / 2),
-      velocidade = Math.min(8.4, Math.hypot(jogo.vx, jogo.vy) + 0.1);
+      velocidade = Math.min(
+        8.4 + (jogo.nivel - 1) * 0.7,
+        Math.hypot(jogo.vx, jogo.vy) + 0.1,
+      );
     jogo.vx = impacto * velocidade * 0.9;
     jogo.vy = -Math.sqrt(Math.max(16, velocidade ** 2 - jogo.vx ** 2));
     jogo.bolaY = H - 34 - RAIO_BOLA;
@@ -170,20 +214,48 @@ function atualizar() {
     ) {
       bloco.ativo = false;
       jogo.vy *= -1;
-      jogo.pontos += 100;
+      jogo.pontos += 100 * jogo.nivel;
       atualizarPlacar();
       emitirSom(520);
-      if (jogo.blocos.every((item) => !item.ativo)) finalizar(true);
+      if (jogo.blocos.every((item) => !item.ativo)) concluirNivel();
       break;
     }
   if (jogo.bolaY > H + RAIO_BOLA) {
     jogo.vidas--;
     atualizarPlacar();
-    jogo.vidas <= 0 ? finalizar(false) : reposicionarBola();
+    jogo.vidas <= 0 ? finalizar(false) : reposicionarBola(true);
   }
 }
 
+function concluirNivel() {
+  jogo.pontos += 500 * jogo.nivel;
+  atualizarPlacar();
+
+  if (jogo.nivel === jogo.totalNiveis) {
+    finalizar(true);
+    return;
+  }
+
+  acaoResultado = "proximoNivel";
+  elementos.tituloResultado.textContent = `NÍVEL ${jogo.nivel} CONCLUÍDO`;
+  elementos.mensagemResultado.textContent = `Prepare-se para o nível ${jogo.nivel + 1}. A bola ficará mais rápida!`;
+  elementos.pontuacaoFinal.textContent = jogo.pontos;
+  document.querySelector("#jogarNovamente").innerHTML =
+    "▶ &nbsp; PRÓXIMO NÍVEL";
+  mostrarTela("nivelConcluido");
+  emitirSom(760);
+}
+
+function iniciarProximoNivel() {
+  jogo.nivel++;
+  criarBlocos();
+  reposicionarBola();
+  atualizarPlacar();
+  mostrarTela("jogando");
+}
+
 function finalizar(venceu) {
+  acaoResultado = "reiniciar";
   elementos.tituloResultado.textContent = venceu
     ? "VOCÊ CONSEGUIU!"
     : "FIM DE JOGO";
@@ -191,6 +263,9 @@ function finalizar(venceu) {
     ? "Todos os blocos caíram."
     : "A bola escapou.";
   elementos.pontuacaoFinal.textContent = jogo.pontos;
+  document.querySelector("#jogarNovamente").innerHTML = venceu
+    ? "↻ &nbsp; JOGAR NOVAMENTE"
+    : "↻ &nbsp; TENTAR NOVAMENTE";
   mostrarTela(venceu ? "vitoria" : "derrota");
 }
 
@@ -252,7 +327,9 @@ document.querySelectorAll(".controle").forEach((botao) =>
 document.querySelector("#iniciar").addEventListener("click", iniciarJogo);
 document
   .querySelector("#jogarNovamente")
-  .addEventListener("click", iniciarJogo);
+  .addEventListener("click", () =>
+    acaoResultado === "proximoNivel" ? iniciarProximoNivel() : iniciarJogo(),
+  );
 document
   .querySelector("#continuar")
   .addEventListener("click", () => mostrarTela("jogando"));
@@ -269,11 +346,34 @@ elementos.som.addEventListener("click", () => {
   somAtivo = !somAtivo;
   elementos.som.textContent = somAtivo ? "♪ SOM ATIVO" : "♩ SOM DESATIVADO";
 });
-canvas.addEventListener("mousemove", (evento) => {
+
+elementos.telaCheia.addEventListener("click", async () => {
+  try {
+    if (!document.fullscreenElement) {
+      await document.documentElement.requestFullscreen();
+    } else {
+      await document.exitFullscreen();
+    }
+  } catch {
+    // O jogo continua funcionando caso o navegador bloqueie a tela cheia.
+  }
+});
+
+document.addEventListener("fullscreenchange", () => {
+  elementos.telaCheia.textContent = document.fullscreenElement
+    ? "⛶ SAIR DA TELA CHEIA"
+    : "⛶ TELA CHEIA";
+});
+
+function atualizarPosicaoMouse(evento) {
   if (tipoControle !== "mouse") return;
   const r = canvas.getBoundingClientRect();
-  mouseX = ((evento.clientX - r.left) / r.width) * W;
-});
+  const posicaoX = Math.max(r.left, Math.min(r.right, evento.clientX));
+  mouseX = ((posicaoX - r.left) / r.width) * W;
+}
+
+// O mouse é acompanhado em toda a janela, inclusive fora do canvas.
+window.addEventListener("pointermove", atualizarPosicaoMouse);
 canvas.addEventListener(
   "touchmove",
   (evento) => {
