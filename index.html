@@ -56,32 +56,21 @@
               <p class="descricao">
                 Cinco fases, blocos especiais, combos e power-ups.
               </p>
-              <div class="acoes-menu">
+              <div class="acao-principal">
                 <button class="primario" id="iniciar">
                   <span class="icone-botao">▶</span>
                   <span>INICIAR JOGO<small>NOVA PARTIDA</small></span>
                 </button>
+              </div>
+              <div class="acoes-secundarias">
                 <button class="secundario" id="abrirConfiguracoes">
                   <span class="icone-botao">⚙</span>
                   <span>CONFIGURAÇÕES<small>CONTROLES E SOM</small></span>
                 </button>
-              </div>
-              <p class="titulo-recordes">RECORDES POR DIFICULDADE</p>
-              <div
-                class="quadro-recordes"
-                aria-label="Recordes por dificuldade"
-              >
-                <article data-recorde="facil">
-                  <small>FÁCIL · ×1</small><strong>000000</strong><span>—</span>
-                </article>
-                <article data-recorde="normal">
-                  <small>NORMAL · ×1,5</small><strong>000000</strong
-                  ><span>—</span>
-                </article>
-                <article data-recorde="dificil">
-                  <small>DIFÍCIL · ×2</small><strong>000000</strong
-                  ><span>—</span>
-                </article>
+                <button class="secundario" id="abrirRanking">
+                  <span class="icone-botao">★</span>
+                  <span>RANKING<small>TOP 10 LOCAL</small></span>
+                </button>
               </div>
             </section>
 
@@ -183,6 +172,31 @@
               <button class="secundario" id="fecharConfiguracoes">
                 VOLTAR
               </button>
+            </section>
+
+            <section class="painel painel-ranking escondido" id="ranking">
+              <p class="rotulo">HALL DA FAMA</p>
+              <h2>Ranking local</h2>
+              <p class="descricao-ranking">
+                Os 10 melhores resultados salvos neste navegador.
+              </p>
+              <div class="abas-ranking" role="tablist" aria-label="Dificuldade">
+                <button role="tab" data-ranking="facil">FÁCIL</button>
+                <button role="tab" class="selecionada" data-ranking="normal">
+                  NORMAL
+                </button>
+                <button role="tab" data-ranking="dificil">DIFÍCIL</button>
+              </div>
+              <div class="cabecalho-ranking" aria-hidden="true">
+                <span>#</span><span>JOGADOR</span><span>FASE</span
+                ><span>PONTOS</span>
+              </div>
+              <ol class="lista-ranking" id="listaRanking"></ol>
+              <p class="ranking-vazio escondido" id="rankingVazio">
+                Nenhum resultado nesta dificuldade.<br />Jogue uma partida para
+                entrar no ranking!
+              </p>
+              <button class="secundario" id="fecharRanking">VOLTAR</button>
             </section>
 
             <section class="painel escondido" id="pausa">

@@ -20,6 +20,9 @@
     menu: $("#menu"),
     preJogo: $("#preJogo"),
     configuracoes: $("#configuracoes"),
+    ranking: $("#ranking"),
+    listaRanking: $("#listaRanking"),
+    rankingVazio: $("#rankingVazio"),
     pausa: $("#pausa"),
     resultado: $("#resultado"),
     pontos: $("#pontuacao"),
@@ -76,6 +79,7 @@
   let estado = "menu",
     controle = "teclado",
     dificuldade = "normal",
+    dificuldadeRanking = "normal",
     acaoResultado = "reiniciar";
   let aguardandoLancamento = false,
     ultimoTempo = performance.now();
@@ -112,17 +116,33 @@
     return { facil: "FÁCIL", normal: "NORMAL", dificil: "DIFÍCIL" }[chave];
   }
 
-  function atualizarQuadroRecordes() {
+  function atualizarRanking() {
     persistencia = Storage.carregar();
-    document.querySelectorAll("[data-recorde]").forEach((cartao) => {
-      const chave = cartao.dataset.recorde;
-      const entrada = persistencia.recordes[chave];
-      cartao.querySelector("strong").textContent = String(
-        entrada.pontos,
-      ).padStart(6, "0");
-      cartao.querySelector("span").textContent = entrada.nome;
-      cartao.classList.remove("ativo");
+    const lista = persistencia.rankings?.[dificuldadeRanking] || [];
+    el.listaRanking.replaceChildren();
+    lista.forEach((entrada, indice) => {
+      const item = document.createElement("li");
+      const data = new Date(entrada.data);
+      item.title = Number.isNaN(data.getTime())
+        ? "Resultado local"
+        : `Registrado em ${data.toLocaleDateString("pt-BR")}`;
+      const posicao = document.createElement("span");
+      posicao.className = "posicao";
+      posicao.textContent = `${indice + 1}º`;
+      const nome = document.createElement("span");
+      nome.className = "nome-ranking";
+      nome.textContent = entrada.nome;
+      const nivel = document.createElement("span");
+      nivel.className = "fase-ranking";
+      nivel.textContent = entrada.nivel;
+      const pontos = document.createElement("strong");
+      pontos.className = "pontos-ranking";
+      pontos.textContent = String(entrada.pontos).padStart(6, "0");
+      item.append(posicao, nome, nivel, pontos);
+      el.listaRanking.appendChild(item);
     });
+    el.listaRanking.classList.toggle("escondido", lista.length === 0);
+    el.rankingVazio.classList.toggle("escondido", lista.length > 0);
   }
 
   function atualizarRecordeExibido() {
@@ -134,7 +154,6 @@
     el.tituloRecorde.textContent = `RECORDE — ${nomeDificuldade(dificuldade)}`;
     el.recorde.textContent = String(entrada.pontos).padStart(6, "0");
     el.recordista.textContent = entrada.nome;
-    atualizarQuadroRecordes();
   }
 
   function aplicarConfiguracoes() {
@@ -170,7 +189,7 @@
     estado = nome;
     el.jogo.classList.toggle(
       "modo-menu",
-      ["menu", "preJogo", "configuracoes"].includes(nome),
+      ["menu", "preJogo", "configuracoes", "ranking"].includes(nome),
     );
     el.sobreposicao.classList.toggle(
       "oculta",
@@ -179,6 +198,7 @@
     el.menu.classList.toggle("escondido", nome !== "menu");
     el.preJogo.classList.toggle("escondido", nome !== "preJogo");
     el.configuracoes.classList.toggle("escondido", nome !== "configuracoes");
+    el.ranking.classList.toggle("escondido", nome !== "ranking");
     el.pausa.classList.toggle("escondido", nome !== "pausado");
     el.resultado.classList.toggle(
       "escondido",
@@ -587,6 +607,7 @@
   function finalizar(venceu) {
     acaoResultado = "reiniciar";
     Storage.atualizarRecorde(dificuldade, jogador, jogo.pontos);
+    Storage.registrarResultado(dificuldade, jogador, jogo.pontos, jogo.nivel);
     el.tituloResultado.textContent = venceu
       ? "CAMPEÃO DO BREAKOUT!"
       : "FIM DE JOGO";
@@ -806,6 +827,22 @@
   $("#fecharConfiguracoes").addEventListener("click", () =>
     mostrarTela("menu"),
   );
+  $("#abrirRanking").addEventListener("click", () => {
+    atualizarRanking();
+    mostrarTela("ranking");
+  });
+  $("#fecharRanking").addEventListener("click", () => mostrarTela("menu"));
+  document.querySelectorAll("[data-ranking]").forEach((botao) =>
+    botao.addEventListener("click", () => {
+      dificuldadeRanking = botao.dataset.ranking;
+      document
+        .querySelectorAll("[data-ranking]")
+        .forEach((item) =>
+          item.classList.toggle("selecionada", item === botao),
+        );
+      atualizarRanking();
+    }),
+  );
   $("#salvarConfiguracoes").addEventListener("click", () => {
     configuracoes = {
       controle,
@@ -846,7 +883,6 @@
   el.nomeJogador.value = jogador;
   preencherNiveis();
   aplicarConfiguracoes();
-  atualizarQuadroRecordes();
   atualizarHUD();
   criarNivel();
   prepararLancamento(false);

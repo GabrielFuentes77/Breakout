@@ -8,6 +8,11 @@ window.BreakoutStorage = (() => {
       normal: { nome: "—", pontos: 0 },
       dificil: { nome: "—", pontos: 0 },
     },
+    rankings: {
+      facil: [],
+      normal: [],
+      dificil: [],
+    },
     jogador: "",
     nivelDesbloqueado: 1,
     configuracoes: {
@@ -30,6 +35,11 @@ window.BreakoutStorage = (() => {
         ...padrao,
         ...salvo,
         recordes: { ...padrao.recordes, ...(salvo?.recordes || {}) },
+        rankings: {
+          facil: [...(salvo?.rankings?.facil || [])],
+          normal: [...(salvo?.rankings?.normal || [])],
+          dificil: [...(salvo?.rankings?.dificil || [])],
+        },
         configuracoes: {
           ...padrao.configuracoes,
           ...(salvo?.configuracoes || {}),
@@ -44,6 +54,20 @@ window.BreakoutStorage = (() => {
         delete dados.recorde;
         salvar(dados);
       }
+      let rankingMigrado = false;
+      ["facil", "normal", "dificil"].forEach((dificuldade) => {
+        const recorde = dados.recordes[dificuldade];
+        if (!dados.rankings[dificuldade].length && recorde.pontos > 0) {
+          dados.rankings[dificuldade].push({
+            nome: recorde.nome,
+            pontos: recorde.pontos,
+            nivel: "—",
+            data: "",
+          });
+          rankingMigrado = true;
+        }
+      });
+      if (rankingMigrado) salvar(dados);
       return dados;
     } catch {
       return structuredClone(padrao);
@@ -58,6 +82,25 @@ window.BreakoutStorage = (() => {
       salvar(dados);
     }
     return dados.recordes[dificuldade];
+  }
+
+  function registrarResultado(dificuldade, nome, pontos, nivel) {
+    const dados = carregar();
+    const pontuacao = Math.round(pontos);
+    if (pontuacao <= 0) return dados.rankings[dificuldade] || [];
+
+    const lista = dados.rankings[dificuldade] || [];
+    lista.push({
+      nome,
+      pontos: pontuacao,
+      nivel,
+      data: new Date().toISOString(),
+    });
+    dados.rankings[dificuldade] = lista
+      .sort((a, b) => b.pontos - a.pontos || b.nivel - a.nivel)
+      .slice(0, 10);
+    salvar(dados);
+    return dados.rankings[dificuldade];
   }
 
   function desbloquearNivel(nivel) {
@@ -85,6 +128,7 @@ window.BreakoutStorage = (() => {
   return {
     carregar,
     atualizarRecorde,
+    registrarResultado,
     desbloquearNivel,
     salvarConfiguracoes,
     salvarJogador,
