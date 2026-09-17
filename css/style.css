@@ -43,6 +43,30 @@ select {
   background: #090d21;
   overflow: hidden;
 }
+.jogo.modo-menu .placar,
+.jogo.modo-menu .barra,
+.jogo.modo-menu .aviso-jogo {
+  display: none;
+}
+.jogo.modo-menu canvas,
+.cenario-menu {
+  display: none;
+}
+.jogo.modo-menu .cenario-menu {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 44%, #273a8666 0, transparent 30%),
+    radial-gradient(circle at 8% 15%, #ff4d8d20 0, transparent 24%),
+    radial-gradient(circle at 92% 80%, #68e0cf18 0, transparent 25%),
+    linear-gradient(145deg, #111735 0%, #070a1b 48%, #03050d 100%);
+}
+.jogo.modo-menu .sobreposicao {
+  background: transparent;
+  backdrop-filter: none;
+}
 .placar {
   flex: 0 0 72px;
   display: grid;
@@ -127,6 +151,105 @@ canvas {
 }
 .sobreposicao.oculta {
   display: none;
+}
+.brilho-menu {
+  position: absolute;
+  width: min(42vw, 560px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.16;
+}
+.brilho-um {
+  top: -22%;
+  left: 8%;
+  background: var(--pink);
+}
+.brilho-dois {
+  right: 4%;
+  bottom: -28%;
+  background: var(--cyan);
+}
+.grade-arcade {
+  position: absolute;
+  left: -15%;
+  right: -15%;
+  bottom: -27%;
+  height: 53%;
+  opacity: 0.15;
+  transform: perspective(420px) rotateX(63deg);
+  transform-origin: center top;
+  background-image:
+    linear-gradient(#68e0cf66 1px, transparent 1px),
+    linear-gradient(90deg, #68e0cf66 1px, transparent 1px);
+  background-size: 58px 38px;
+  -webkit-mask-image: linear-gradient(transparent, #000 45%);
+  mask-image: linear-gradient(transparent, #000 45%);
+}
+.blocos-decorativos {
+  position: absolute;
+  top: 15%;
+  display: grid;
+  grid-template-columns: repeat(2, clamp(74px, 8vw, 130px));
+  gap: clamp(10px, 1vw, 18px);
+  opacity: 0.52;
+  transform: rotate(-8deg);
+}
+.blocos-esquerda {
+  left: -4%;
+}
+.blocos-direita {
+  right: -4%;
+  transform: rotate(8deg);
+}
+.blocos-decorativos i {
+  height: clamp(24px, 3vw, 42px);
+  border: 1px solid #ffffff24;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #ff4d8d, #b22d82);
+  box-shadow: 0 0 26px #ff4d8d3d;
+}
+.blocos-decorativos i:nth-child(3n + 2) {
+  background: linear-gradient(135deg, #ffd166, #e06e46);
+  box-shadow: 0 0 26px #ffd16633;
+}
+.blocos-decorativos i:nth-child(3n) {
+  background: linear-gradient(135deg, #68e0cf, #3286b8);
+  box-shadow: 0 0 26px #68e0cf33;
+}
+.bola-decorativa {
+  position: absolute;
+  top: 21%;
+  left: 76%;
+  width: clamp(18px, 2vw, 30px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow:
+    0 0 12px #fff,
+    0 0 32px var(--cyan);
+  animation: flutuar-bola 4s ease-in-out infinite;
+}
+.plataforma-decorativa {
+  position: absolute;
+  left: 12%;
+  bottom: 17%;
+  width: clamp(130px, 16vw, 230px);
+  height: clamp(12px, 1.4vw, 19px);
+  border-radius: 999px;
+  background: linear-gradient(90deg, #2f8fa7, #8affea, #2f8fa7);
+  box-shadow: 0 0 28px #68e0cf80;
+  animation: flutuar-plataforma 5s ease-in-out infinite;
+}
+@keyframes flutuar-bola {
+  50% {
+    transform: translate(-40px, 34px);
+  }
+}
+@keyframes flutuar-plataforma {
+  50% {
+    transform: translateX(44px);
+  }
 }
 .painel {
   width: min(540px, 96%);
@@ -292,10 +415,16 @@ h2 {
 .acoes-menu {
   display: grid;
   grid-template-columns: 1.5fr 1fr;
-  gap: 8px;
+  gap: 12px;
 }
 .menu {
-  width: min(500px, 96%);
+  width: min(760px, 94%);
+  border-color: #8298ff52;
+  background: linear-gradient(145deg, #1a2551f5, #090d24f8), var(--panel);
+  box-shadow:
+    0 32px 100px #000b,
+    0 0 0 1px #ffffff08 inset,
+    0 0 70px #526dff18;
 }
 .menu .descricao {
   margin-bottom: 24px;
@@ -312,6 +441,39 @@ h2 {
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 1.5px;
+}
+.acoes-menu button {
+  display: flex;
+  min-height: 68px;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  text-align: left;
+}
+.acoes-menu button > span:not(.icone-botao) {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.acoes-menu button small {
+  opacity: 0.62;
+  font-size: 0.68em;
+  letter-spacing: 1px;
+}
+.icone-botao {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  place-items: center;
+  border-radius: 11px;
+  background: #0714252e;
+  font-size: 20px;
+}
+.secundario .icone-botao {
+  border: 1px solid #8298ff36;
+  background: #738bff12;
+  color: var(--cyan);
 }
 .primario {
   border: 0;
@@ -334,19 +496,27 @@ h2 {
   gap: 7px;
   margin-top: 13px;
 }
+.titulo-recordes {
+  margin: 18px 0 8px;
+  color: #7e8db5;
+  font-size: clamp(10px, 0.72vw, 12px);
+  font-weight: 900;
+  letter-spacing: 2px;
+}
 .quadro-recordes article {
   display: flex;
   min-width: 0;
   flex-direction: column;
   gap: 2px;
-  padding: 8px 6px;
+  padding: 14px 10px;
   border: 1px solid #344063;
   border-radius: 8px;
   background: #090f25;
 }
-.quadro-recordes article.ativo {
-  border-color: var(--cyan);
-  background: #68e0cf0c;
+.quadro-recordes article:hover {
+  border-color: #68e0cf66;
+  background: #0d1635;
+  transform: translateY(-2px);
 }
 .quadro-recordes small {
   color: #7785a9;
@@ -494,6 +664,9 @@ h2 {
   .acoes-menu {
     grid-template-columns: 1fr;
   }
+  .blocos-decorativos {
+    opacity: 0.22;
+  }
   .barra {
     padding: 0 5px;
     gap: 0;
@@ -535,6 +708,9 @@ h2 {
   }
   .quadro-recordes {
     display: none;
+  }
+  .acoes-menu button {
+    min-height: 54px;
   }
 }
 
@@ -626,7 +802,7 @@ h2 {
     width: min(720px, 92%);
   }
   .menu {
-    width: min(700px, 92%);
+    width: min(820px, 92%);
   }
   .quadro-recordes article {
     padding: 12px 10px;
@@ -642,5 +818,15 @@ h2 {
   }
   .quadro-recordes {
     gap: 6px;
+  }
+  .blocos-decorativos {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bola-decorativa,
+  .plataforma-decorativa {
+    animation: none;
   }
 }

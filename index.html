@@ -8,7 +8,7 @@
   </head>
   <body>
     <main class="pagina">
-      <section class="jogo" aria-label="Jogo Breakout">
+      <section class="jogo modo-menu" aria-label="Jogo Breakout">
         <header class="placar">
           <div>
             <small>PONTUAÇÃO</small><strong id="pontuacao">000000</strong>
@@ -32,6 +32,19 @@
 
         <div class="palco" id="palco">
           <canvas id="canvas" width="900" height="560"></canvas>
+          <div class="cenario-menu" aria-hidden="true">
+            <div class="brilho-menu brilho-um"></div>
+            <div class="brilho-menu brilho-dois"></div>
+            <div class="blocos-decorativos blocos-esquerda">
+              <i></i><i></i><i></i><i></i><i></i><i></i>
+            </div>
+            <div class="blocos-decorativos blocos-direita">
+              <i></i><i></i><i></i><i></i><i></i><i></i>
+            </div>
+            <div class="bola-decorativa"></div>
+            <div class="plataforma-decorativa"></div>
+            <div class="grade-arcade"></div>
+          </div>
           <div class="aviso-jogo escondido" id="avisoJogo">
             ESPAÇO OU CLIQUE PARA LANÇAR
           </div>
@@ -45,12 +58,15 @@
               </p>
               <div class="acoes-menu">
                 <button class="primario" id="iniciar">
-                  ▶ &nbsp; INICIAR JOGO
+                  <span class="icone-botao">▶</span>
+                  <span>INICIAR JOGO<small>NOVA PARTIDA</small></span>
                 </button>
                 <button class="secundario" id="abrirConfiguracoes">
-                  ⚙ CONFIGURAÇÕES
+                  <span class="icone-botao">⚙</span>
+                  <span>CONFIGURAÇÕES<small>CONTROLES E SOM</small></span>
                 </button>
               </div>
+              <p class="titulo-recordes">RECORDES POR DIFICULDADE</p>
               <div
                 class="quadro-recordes"
                 aria-label="Recordes por dificuldade"

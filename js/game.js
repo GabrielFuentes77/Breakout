@@ -14,6 +14,7 @@
   const $ = (seletor) => document.querySelector(seletor);
 
   const el = {
+    jogo: $(".jogo"),
     palco: $("#palco"),
     sobreposicao: $("#sobreposicao"),
     menu: $("#menu"),
@@ -120,7 +121,7 @@
         entrada.pontos,
       ).padStart(6, "0");
       cartao.querySelector("span").textContent = entrada.nome;
-      cartao.classList.toggle("ativo", chave === dificuldade);
+      cartao.classList.remove("ativo");
     });
   }
 
@@ -167,6 +168,10 @@
 
   function mostrarTela(nome) {
     estado = nome;
+    el.jogo.classList.toggle(
+      "modo-menu",
+      ["menu", "preJogo", "configuracoes"].includes(nome),
+    );
     el.sobreposicao.classList.toggle(
       "oculta",
       ["jogando", "preparando"].includes(nome),
