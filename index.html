@@ -3,49 +3,172 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Breakout</title>
+    <title>Breakout 2.0</title>
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
     <main class="pagina">
-      <header class="marca"><i></i> BREAK<span>OUT</span></header>
       <section class="jogo" aria-label="Jogo Breakout">
-        <div class="placar">
+        <header class="placar">
           <div>
             <small>PONTUAÇÃO</small><strong id="pontuacao">000000</strong>
+          </div>
+          <div class="recorde-hud">
+            <small id="tituloRecorde">RECORDE — NORMAL</small>
+            <strong id="recorde">000000</strong>
+            <em id="recordista">—</em>
           </div>
           <div class="nivel">
             <small>NÍVEL</small><strong id="nivel">1 / 5</strong>
           </div>
-          <div class="vidas">
-            <small>VIDAS</small><strong id="vidas">● ● ●</strong>
+          <div class="combo">
+            <small>COMBO</small><strong id="combo">×1</strong>
           </div>
-        </div>
+          <div class="vidas">
+            <small>VIDAS</small
+            ><strong id="vidas" aria-label="3 vidas">♥ ♥ ♥</strong>
+          </div>
+        </header>
+
         <div class="palco" id="palco">
           <canvas id="canvas" width="900" height="560"></canvas>
+          <div class="aviso-jogo escondido" id="avisoJogo">
+            ESPAÇO OU CLIQUE PARA LANÇAR
+          </div>
+
           <div class="sobreposicao" id="sobreposicao">
-            <section class="painel" id="menu">
-              <p class="rotulo">ARCADE CLÁSSICO</p>
-              <h1>BREAK<span>OUT</span></h1>
+            <section class="painel menu" id="menu">
+              <p class="rotulo">ARCADE EVOLUTION</p>
+              <h1>BREAK<span>OUT</span><sup>2.0</sup></h1>
               <p class="descricao">
-                Escolha o controle e supere cinco níveis diferentes.
+                Cinco fases, blocos especiais, combos e power-ups.
               </p>
-              <div
-                class="opcoes-controle"
-                role="group"
-                aria-label="Escolha o controle"
-              >
-                <button class="controle selecionado" data-controle="teclado">
-                  ⌨<b>TECLADO</b><small>Setas ou A / D</small>
+              <div class="acoes-menu">
+                <button class="primario" id="iniciar">
+                  ▶ &nbsp; INICIAR JOGO
                 </button>
-                <button class="controle" data-controle="mouse">
-                  ◉<b>MOUSE</b><small>Mova o cursor</small>
+                <button class="secundario" id="abrirConfiguracoes">
+                  ⚙ CONFIGURAÇÕES
                 </button>
               </div>
-              <button class="primario" id="iniciar">
-                ▶ &nbsp; INICIAR JOGO
+              <div
+                class="quadro-recordes"
+                aria-label="Recordes por dificuldade"
+              >
+                <article data-recorde="facil">
+                  <small>FÁCIL · ×1</small><strong>000000</strong><span>—</span>
+                </article>
+                <article data-recorde="normal">
+                  <small>NORMAL · ×1,5</small><strong>000000</strong
+                  ><span>—</span>
+                </article>
+                <article data-recorde="dificil">
+                  <small>DIFÍCIL · ×2</small><strong>000000</strong
+                  ><span>—</span>
+                </article>
+              </div>
+            </section>
+
+            <section class="painel escondido" id="preJogo">
+              <p class="rotulo">NOVA PARTIDA</p>
+              <h2>Quem vai jogar?</h2>
+              <label class="campo-jogador" for="nomeJogador">
+                <span>NOME DO JOGADOR</span>
+                <input
+                  id="nomeJogador"
+                  type="text"
+                  maxlength="18"
+                  autocomplete="nickname"
+                  placeholder="Digite seu nome"
+                />
+              </label>
+              <p class="erro-nome escondido" id="erroNome">
+                Informe seu nome antes de continuar.
+              </p>
+              <div class="grupo-config">
+                <span>DIFICULDADE</span>
+                <div
+                  class="opcoes tres"
+                  role="group"
+                  aria-label="Escolha a dificuldade"
+                >
+                  <button class="dificuldade" data-dificuldade="facil">
+                    FÁCIL · ×1
+                  </button>
+                  <button
+                    class="dificuldade selecionada"
+                    data-dificuldade="normal"
+                  >
+                    NORMAL · ×1,5
+                  </button>
+                  <button class="dificuldade" data-dificuldade="dificil">
+                    DIFÍCIL · ×2
+                  </button>
+                </div>
+              </div>
+              <label class="seletor-nivel"
+                >FASE INICIAL
+                <select id="seletorNivel" aria-label="Fase inicial"></select>
+              </label>
+              <button class="primario" id="confirmarInicio">
+                ▶ &nbsp; COMEÇAR PARTIDA
+              </button>
+              <button class="secundario" id="voltarPreJogo">VOLTAR</button>
+            </section>
+
+            <section class="painel escondido" id="configuracoes">
+              <p class="rotulo">CONFIGURAÇÕES</p>
+              <h2>Personalize sua partida</h2>
+              <div class="grupo-config">
+                <span>CONTROLE</span>
+                <div
+                  class="opcoes duas"
+                  role="group"
+                  aria-label="Escolha o controle"
+                >
+                  <button class="opcao selecionada" data-controle="teclado">
+                    ⌨<b>TECLADO</b><small>Setas ou A / D</small>
+                  </button>
+                  <button class="opcao" data-controle="mouse">
+                    ◉<b>MOUSE</b><small>Mova o cursor</small>
+                  </button>
+                </div>
+              </div>
+              <label
+                >VOLUME <output id="valorVolume">70%</output
+                ><input id="volume" type="range" min="0" max="100" value="70"
+              /></label>
+              <label
+                >SENSIBILIDADE DO MOUSE
+                <output id="valorSensibilidade">18</output
+                ><input
+                  id="sensibilidade"
+                  type="range"
+                  min="8"
+                  max="35"
+                  value="18"
+              /></label>
+              <label
+                >VELOCIDADE DA PLATAFORMA <output id="valorVelocidade">8</output
+                ><input
+                  id="velocidadePlataforma"
+                  type="range"
+                  min="5"
+                  max="14"
+                  value="8"
+              /></label>
+              <label class="check"
+                ><input id="efeitos" type="checkbox" checked /> ATIVAR
+                PARTÍCULAS E EFEITOS</label
+              >
+              <button class="primario" id="salvarConfiguracoes">
+                SALVAR CONFIGURAÇÕES
+              </button>
+              <button class="secundario" id="fecharConfiguracoes">
+                VOLTAR
               </button>
             </section>
+
             <section class="painel escondido" id="pausa">
               <p class="rotulo">JOGO PAUSADO</p>
               <h2>Continue quando quiser.</h2>
@@ -54,28 +177,35 @@
               </button>
               <button class="secundario sair-menu">SAIR PARA O MENU</button>
             </section>
+
             <section class="painel escondido" id="resultado">
               <p class="rotulo" id="tituloResultado">FIM DE JOGO</p>
               <h2 id="mensagemResultado"></h2>
               <p class="resultado-pontos">
-                PONTUAÇÃO FINAL <strong id="pontuacaoFinal">0</strong>
+                PONTUAÇÃO <strong id="pontuacaoFinal">0</strong>
               </p>
-              <button class="primario" id="jogarNovamente">
+              <button class="primario" id="acaoResultado">
                 ↻ &nbsp; JOGAR NOVAMENTE
               </button>
               <button class="secundario sair-menu">VOLTAR AO MENU</button>
             </section>
           </div>
         </div>
-        <div class="barra">
-          <span id="controleAtual">CONTROLE: TECLADO</span
-          ><button id="som">♪ SOM ATIVO</button
-          ><button id="telaCheia">⛶ TELA CHEIA</button
-          ><button id="pausar">Ⅱ PAUSAR</button>
-        </div>
+
+        <footer class="barra">
+          <span id="controleAtual">CONTROLE: TECLADO</span>
+          <span id="efeitoAtual" class="efeito-atual"></span>
+          <button id="som">♪ SOM ATIVO</button>
+          <button id="telaCheia">⛶ TELA CHEIA</button>
+          <button id="pausar">Ⅱ PAUSAR</button>
+        </footer>
       </section>
-      <footer>PROJETO ACADÊMICO • HTML • CSS • JAVASCRIPT</footer>
     </main>
+
+    <script src="js/storage.js"></script>
+    <script src="js/levels.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/controls.js"></script>
     <script src="js/game.js"></script>
   </body>
 </html>
